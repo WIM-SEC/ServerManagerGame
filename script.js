@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM要素 ---
     const portListEl = document.getElementById('port-list');
     const browserTabEl = document.getElementById('browser-tab');
     const browserAddressBarEl = document.getElementById('browser-address-bar');
@@ -11,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorModalCloseBtn = document.getElementById('error-modal-close');
     const resetButton = document.getElementById('reset-button');
 
-    let initialGameState;
+    // --- ゲームの状態 ---
+    let gameState;
 
     function getInitialGameState() {
         return {
@@ -25,27 +27,45 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             inbox: [],
             currentURL: 'https://abc-shopping.com',
-            purchaseMessage: '',
         };
     }
     
-    let gameState = getInitialGameState();
-    
-    // ページ定義
+    // --- 時刻をフォーマットするヘルパー関数 ---
+    function getCurrentTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    }
+
+    // --- ページ定義 ---
     const pages = {
         'https://abc-shopping.com': {
             title: 'ABCショッピング', port: '443',
             content: (isFtpTrapActive) => {
                 if (isFtpTrapActive) return hackedPageContent();
                 return `<h3>ABCショッピングへようこそ！</h3>
-                        <div class="product"><h4>高機能Webカメラ</h4><p>最新モデルのWebカメラです。</p><button id="buy-button">今すぐ購入</button></div>
-                        <p style="color: green;">${gameState.purchaseMessage}</p>`;
+                        <div class="product">
+                            <img src="./webcam.png" alt="Webカメラ" class="product-image">
+                            <h4>高機能Webカメラ</h4>
+                            <p>最新モデルのWebカメラです。</p>
+                            <button id="buy-button">今すぐ購入（12,000円）</button>
+                        </div>`;
             }
+        },
+        'https://abc-shopping.com/purchase_complete': {
+            title: 'ご購入ありがとうございます', port: '443',
+            content: () => `
+                <div class="purchase-confirmation">
+                    <h3>ご購入いただき、誠にありがとうございます！</h3>
+                    <p>ご注文の手続きは完了いたしました。</p>
+                    <div id="email-status" class="status pending">確認メールを送信しています...</div>
+                </div>`
         },
         'https://xyz-mail.com/inbox/': {
             title: 'メールボックス | XYZメール', port: null,
             content: () => {
-                let inboxHtml = gameState.inbox.map((mail, index) => `<div class="mail-item" data-mail-id="${index}"><span class="from">${mail.from}</span> <span class="subject">${mail.subject}</span></div>`).join('');
+                let inboxHtml = gameState.inbox.map((mail, index) => `<div class="mail-item" data-mail-id="${index}"><div class="from">${mail.from}</div><div class="subject">${mail.subject}</div><div class="timestamp">${mail.timestamp}</div></div>`).join('');
                 return `<div class="mail-client"><h3>受信トレイ</h3><button id="compose-mail-button">サポートに問い合わせる</button><div class="mail-inbox">${inboxHtml || '<p>受信メールはありません。</p>'}</div><div id="mail-content-view" class="mail-content"></div></div>`;
             }
         },
@@ -94,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
             browserContentEl.innerHTML = currentPage.content(isFtpTrapActive);
         } else {
             browserContentEl.innerHTML = `<div class="error-page"><h3>このサイトにアクセスできません</h3><p>${gameState.currentURL.split('/')[0]} が見つかりませんでした。</p></div>`;
-            gameState.purchaseMessage = '';
         }
     }
 
@@ -141,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateGame();
     }
 
-
     // --- イベントリスナー ---
     function attachEventListeners() {
         document.querySelectorAll('.port-actions button').forEach(button => {
@@ -155,21 +173,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const buyButton = document.getElementById('buy-button');
         if (buyButton) {
             buyButton.addEventListener('click', () => {
-                gameState.purchaseMessage = 'ご購入ありがとうございます。確認メールを送信しました。';
-                if (gameState.ports['25'].isOpen) {
-                    showDialog(`<strong>顧客情報流出！</strong><br>安全でない通信ポート(非SSL)を経由したため、購入情報が第三者に盗まれました。`, 'セキュリティインシデント', 'error');
-                } else if (gameState.ports['465'].isOpen) {
-                    updateStatusMessage('確認メールを正常に送信しました。', 'success');
-                    gameState.inbox.push({ from: 'thankyou@abc-shopping.com', to:'taro@xyz-mail.com', subject: 'ご購入ありがとうございます', body: 'ABCショッピングをご利用いただき、誠にありがとうございます。\n\n商品：高機能Webカメラ\n金額：12,000円' });
-                } else {
-                    showDialog('メール送信エラー<br>SMTPS(465)ポートが閉鎖中のため、確認メールを送信できませんでした。', 'エラー', 'error');
-                }
-                updateGame();
+                gameState.currentURL = 'https://abc-shopping.com/purchase_complete';
+                updateGame(); // まず購入完了画面を表示
+
+                const emailStatusEl = document.getElementById('email-status');
+                setTimeout(() => { // API呼び出しをシミュレート
+                    if (gameState.ports['25'].isOpen) {
+                        emailStatusEl.textContent = 'メール送信に失敗しました (エラー: 安全でないプロトコルは拒否されました)';
+                        emailStatusEl.className = 'status error';
+                        showDialog(`<strong>顧客情報流出！</strong><br>安全でない通信ポート(非SSL)を経由したため、購入情報が第三者に盗まれました。`, 'セキュリティインシデント', 'error');
+                    } else if (gameState.ports['465'].isOpen) {
+                        emailStatusEl.textContent = '確認メールを送信しました。';
+                        emailStatusEl.className = 'status success';
+                        updateStatusMessage('確認メールを正常に送信しました。', 'success');
+                        gameState.inbox.unshift({ from: 'thankyou@abc-shopping.com', to:'taro@xyz-mail.com', subject: 'ご購入ありがとうございます', body: 'ABCショッピングをご利用いただき、誠にありがとうございます。\n\n商品：高機能Webカメラ\n金額：12,000円', timestamp: getCurrentTime() });
+                    } else {
+                        emailStatusEl.textContent = '確認メールの送信に失敗しました (APIエラー: Mail Gateway Connection Timeout)';
+                        emailStatusEl.className = 'status error';
+                        showDialog('メール送信エラー<br>SMTPS(465)ポートが閉鎖中のため、確認メールを送信できませんでした。', 'エラー', 'error');
+                    }
+                }, 1500);
             });
         }
         
         const composeMailButton = document.getElementById('compose-mail-button');
-        if(composeMailButton) {
+        if (composeMailButton) {
             composeMailButton.addEventListener('click', () => {
                 gameState.currentURL = 'https://xyz-mail.com/compose/';
                 updateGame();
@@ -184,16 +212,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 if (!gameState.ports['465'].isOpen) {
-                     gameState.inbox.push({ from: 'MAILER-DAEMON@xyz-mail.com', to:'taro@xyz-mail.com', subject: 'Undelivered Mail Returned to Sender', body: 'メッセージを送信できませんでした。\nサーバーに接続できませんでした。'});
+                     gameState.inbox.unshift({ from: 'MAILER-DAEMON@xyz-mail.com', to:'taro@xyz-mail.com', subject: 'Undelivered Mail Returned to Sender', body: 'メッセージを送信できませんでした。\nサーバーに接続できませんでした。', timestamp: getCurrentTime() });
                      showDialog('メール送信エラー<br>SMTPS(465)ポートが解放されていません。<br>送信者にエラーメールが返却されました。', 'エラー', 'error');
                 } else {
                     const canReceive = gameState.ports['993'].isOpen;
-                    if (!canReceive) {
-                        updateStatusMessage('注意: メールは送信されましたが、返信を受信するためのIMAPS(993)ポートが閉鎖中です。', 'info');
+                    if (gameState.ports['143'].isOpen) {
+                        showDialog(`<strong>認証情報の漏洩！</strong><br>安全でない通信ポート(非SSL)でメールを受信しようとしたため、メールアカウント情報が第三者に盗まれました。`, 'セキュリティインシデント', 'error');
+                    } else if (!canReceive) {
+                        showDialog('メールは送信されましたが、返信を受信するためのIMAPS(993)ポートが閉鎖されています。<br>サポートからの返信は届きません。', '警告', 'warning');
                     } else {
                         updateStatusMessage('サポートへ問い合わせメールを送信しました。', 'success');
                         setTimeout(() => {
-                            gameState.inbox.push({ from: 'support@abc-shopping.com', to:'taro@xyz-mail.com', subject: 'Re: カメラが壊れていました', body: 'お問い合わせありがとうございます。\n担当者より折り返しご連絡いたします。'});
+                            gameState.inbox.unshift({ from: 'support@abc-shopping.com', to:'taro@xyz-mail.com', subject: 'Re: カメラが壊れていました', body: 'お問い合わせありがとうございます。\n担当者より折り返しご連絡いたします。', timestamp: getCurrentTime() });
                             if(gameState.currentURL.includes('mail')) updateGame();
                         }, 2000);
                     }
@@ -202,7 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateGame();
             });
         }
-
 
         document.querySelectorAll('.mail-item').forEach(item => {
             item.addEventListener('click', (e) => {
@@ -230,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
             fav.addEventListener('click', (e) => {
                 e.preventDefault();
                 gameState.currentURL = e.target.dataset.url;
-                gameState.purchaseMessage = '';
                 updateGame();
             });
         });
@@ -239,5 +267,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 初期化 ---
     resetButton.addEventListener('click', resetGame);
     initializeFavorites();
-    updateGame();
+    resetGame();
 });
