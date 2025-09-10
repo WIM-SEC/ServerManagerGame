@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECサイトサーバー管理者体験シミュレーション | WIM-SEC</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-wrapper">
+        <h1>ECサイトサーバー管理者体験シミュレーション</h1>
+        <p class="description">
+            あなたは「ABCショッピング」のサーバー管理者です。サービスを正常に稼働させるため、<br>
+            <b>必要なポートを解放し、Webサイトの表示、商品の購入、メールの送受信を成功させてください。</b>
+        </p>
+
+        <div class="main-content">
+            <div class="port-panel">
+                <h2>サーバーポート一覧</h2>
+                <div id="port-list" class="port-list-area">
+                    </div>
+                <div class="port-panel-footer">
+                    <button id="reset-button" class="reset-btn">演習をリセット</button>
+                </div>
+            </div>
+
+            <div class="browser-panel">
+                <h2>疑似ブラウザ</h2>
+                <div class="browser-ui">
+                    <div class="browser-header">
+                        <div class="browser-tabs">
+                            <div id="browser-tab" class="tab active">ページタイトル</div>
+                        </div>
+                        <div class="browser-nav">
+                            <div class="browser-buttons">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                            </div>
+                            <div id="browser-address-bar" class="address-bar">
+                                -
+                            </div>
+                        </div>
+                        <div id="favorites-bar" class="favorites-bar">
+                            </div>
+                    </div>
+                    <div id="browser-content" class="browser-content-area">
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-panel">
+            <h2>ステータス</h2>
+            <div id="status-message" class="status-message-area">
+                ミッションを開始してください。
+            </div>
+        </div>
+    </div>
+
+    <div id="error-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 id="error-modal-title">エラー</h3>
+            <p id="error-modal-message"></p>
+            <button id="error-modal-close">閉じる</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <footer class="main-footer">
+        <div>©WIM-CC 2022-2025 <a href="https://w-haruto.com/works/license/" target="_blank">利用規約</a></div>
+        <div>ECサイトサーバー管理者体験シミュレーション（2025.09.10）</div>
+    </footer>
+</body>
+</html>

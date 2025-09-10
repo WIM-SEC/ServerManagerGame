@@ -1,0 +1,165 @@
+:root {
+    --border-color: #dee2e6;
+    --panel-bg: #f8f9fa;
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --font-color: #333;
+    --primary-blue: #007bff;
+    --light-blue-bg: #e8f7ff;
+    --error-red: #dc3545;
+    --info-blue: #0056b3;
+    --success-green: #28a745;
+    --warning-yellow: #ffc107;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    color: var(--font-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.game-wrapper {
+    max-width: 1400px;
+    margin: auto;
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+h1 { color: var(--primary-blue); text-align: center; }
+.description { text-align: center; margin-bottom: 30px; color: #555; line-height: 1.6; }
+.main-content { display: flex; gap: 30px; margin-bottom: 20px; height: 600px; }
+
+.port-panel, .browser-panel {
+    background-color: var(--panel-bg); border: 1px solid var(--border-color);
+    border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px var(--shadow-color);
+    display: flex; flex-direction: column; overflow: hidden;
+}
+
+.port-panel { flex: 1; }
+.browser-panel { flex: 2; }
+
+h2 { color: var(--primary-blue); margin-top: 0; margin-bottom: 15px; text-align: center; font-size: 1.3em; }
+
+.port-list-area { overflow-y: auto; flex-grow: 1; }
+.port-panel-footer { margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); }
+.reset-btn { width: 100%; padding: 10px; font-size: 1em; background-color: var(--warning-yellow); color: #333; border: none; border-radius: 5px; cursor: pointer; }
+.reset-btn:hover { background-color: #e0a800; }
+
+.port-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px; border-bottom: 1px solid var(--border-color);
+}
+.port-item:last-child { border-bottom: none; }
+.port-info .port-number { font-weight: bold; margin-right: 10px; }
+.port-info .port-service { font-style: italic; color: #666; }
+.port-info .port-vulnerability { font-size: 0.8em; color: var(--error-red); margin-left: 5px; }
+
+.port-item button {
+    padding: 6px 12px; border-radius: 5px; cursor: pointer;
+    font-size: 0.9em; transition: background-color 0.2s; border: 1px solid;
+}
+.open-btn { background-color: var(--success-green); color: white; border-color: var(--success-green); }
+.open-btn:hover { background-color: #218838; }
+.close-btn { background-color: var(--error-red); color: white; border-color: var(--error-red); }
+.close-btn:hover { background-color: #c82333; }
+
+.browser-ui {
+    border: 1px solid var(--border-color); border-radius: 8px; background-color: #fff;
+    flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;
+}
+.browser-header { background-color: #e9ecef; border-bottom: 1px solid var(--border-color); padding-top: 5px; }
+.browser-tabs { padding: 0 10px; }
+.tab {
+    display: inline-block; background-color: #fff; padding: 8px 15px; border-radius: 8px 8px 0 0;
+    font-size: 0.9em; border: 1px solid var(--border-color); border-bottom: none; position: relative; top: 1px;
+}
+.browser-nav { display: flex; align-items: center; padding: 8px; background-color: #f8f9fa; border-bottom: 1px solid var(--border-color); }
+.browser-buttons .dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+.dot.red { background-color: #fd6458; }
+.dot.yellow { background-color: #ffbd2e; }
+.dot.green { background-color: #27c93f; }
+.address-bar { background-color: white; border-radius: 15px; padding: 5px 15px; flex-grow: 1; font-size: 0.9em; color: #555; margin-left: 10px; }
+.favorites-bar { background-color: #f8f9fa; padding: 5px 15px; border-bottom: 1px solid var(--border-color); }
+.favorite { cursor: pointer; margin-right: 15px; font-size: 0.9em; color: var(--primary-blue); text-decoration: none; }
+.favorite:hover { text-decoration: underline; }
+
+.browser-content-area { padding: 20px; overflow-y: auto; flex-grow: 1; text-align: center; }
+.status-panel { background-color: var(--light-blue-bg); border: 1px solid #a7d9f7; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px var(--shadow-color); }
+.status-message-area {
+    font-weight: bold; text-align: center; min-height: 2em; display: flex;
+    justify-content: center; align-items: center; transition: color 0.3s;
+}
+.status-info { color: var(--info-blue); }
+.status-error { color: var(--error-red); }
+.status-success { color: var(--success-green); }
+.status-warning { color: var(--warning-yellow); font-weight: bold; }
+
+/* --- Browser Content Specific Styles --- */
+.browser-content-area h3 { margin-top: 0; }
+.browser-content-area button, .mail-item button {
+    padding: 10px 20px; font-size: 1em; background-color: var(--primary-blue);
+    color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px;
+}
+.browser-content-area button:hover { background-color: #0056b3; }
+.product { border: 1px solid var(--border-color); padding: 15px; margin: 20px auto; max-width: 300px; border-radius: 8px; }
+
+.error-page { padding-top: 50px; }
+.error-page h3 { color: var(--error-red); }
+
+.mail-client, .mail-compose { text-align: left; }
+.mail-inbox { border: 1px solid var(--border-color); min-height: 200px; padding: 10px; background-color: #fdfdfd; }
+.mail-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
+.mail-item:hover { background-color: #f0f2f5; }
+.mail-item .from { font-weight: bold; }
+.mail-content { display: none; padding: 15px; margin-top: 10px; background-color: #fff; border: 1px solid var(--border-color); line-height: 1.6; }
+.mail-header { font-size: 0.9em; color: #555; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+.mail-header span { font-weight: bold; color: #000; }
+.mail-body { white-space: pre-wrap; }
+.mail-compose-field { margin-bottom: 10px; font-size: 0.9em; }
+.mail-compose-field span { font-weight: bold; }
+.mail-compose-field pre { background-color: #f8f9fa; padding: 10px; border: 1px solid #eee; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; }
+
+.hacked-site { background-color: black; color: lime; font-family: 'Courier New', monospace; padding: 20px; }
+.hacked-site h3 { color: red; }
+
+/* --- エラーダイアログ用モーダル --- */
+.modal-overlay {
+    position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center;
+}
+.modal-content {
+    background: white; padding: 25px; border-radius: 10px; text-align: center;
+    max-width: 400px; width: 90%; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.modal-content h3 { margin-top: 0; color: var(--error-red); }
+.modal-content button {
+    margin-top: 15px; padding: 10px 25px; background-color: var(--primary-blue);
+    color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em;
+}
+.modal-content button:hover { background-color: #0056b3; }
+
+/* ★追加: フッタースタイル */
+.main-footer {
+    width: 100%;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 30px; /* main contentとの間隔 */
+    color: #6c757d;
+    font-size: 0.9em;
+    border-top: 1px solid var(--border-color);
+}
+.main-footer a {
+    color: #0056b3;
+    text-decoration: none;
+}
+.main-footer a:hover {
+    text-decoration: underline;
+}
